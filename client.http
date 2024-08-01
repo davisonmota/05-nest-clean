@@ -28,6 +28,4 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  "email": "contato@davison.com",
-  "password": "123"
 }
