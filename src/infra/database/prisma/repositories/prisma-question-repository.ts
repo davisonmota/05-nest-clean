@@ -18,28 +18,39 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
   ) {}
 
   async create(question: Question): Promise<void> {
+    const questionData = PrismaQuestionMapper.toPrisma(question);
+    await this.prismaService.question.create({
+      data: questionData,
+    });
+
     DomainEvents.dispatchEventsForAggregate(
       new UniqueEntityID(question.getId()),
     );
   }
 
   async save(question: Question): Promise<void> {
-    const questionIndex = this.items.findIndex(
-      (item) => item.getId() === question.getId(),
-    );
+    const questionData = PrismaQuestionMapper.toPrisma(question);
+    await this.prismaService.question.update({
+      where: {
+        id: question.getId(),
+      },
+      data: questionData,
+    });
 
-    this.items[questionIndex] = question;
     DomainEvents.dispatchEventsForAggregate(
       new UniqueEntityID(question.getId()),
     );
   }
 
   async findBySlug(slug: string): Promise<Question | null> {
-    const question = this.items.find((item) => item.getSlug() === slug);
+    const questionData = await this.prismaService.question.findUnique({
+      where: {
+        slug,
+      },
+    });
+    if (!questionData) return null;
 
-    if (!question) return null;
-
-    return question;
+    return PrismaQuestionMapper.toDomain(questionData);
   }
 
   async findById(id: string): Promise<Question | null> {
@@ -54,11 +65,15 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
   }
 
   async findManyRecent({ page }: PaginationParams): Promise<Question[]> {
-    const questions = this.items
-      .sort((a, b) => b.getCreatedAt().getTime() - a.getCreatedAt().getTime())
-      .splice((page - 1) * 20, page * 20);
+    const questionsData = await this.prismaService.question.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 20,
+      skip: (page - 1) * 20,
+    });
 
-    return questions;
+    return questionsData.map(PrismaQuestionMapper.toDomain);
   }
 
   async delete(question: Question): Promise<void> {
