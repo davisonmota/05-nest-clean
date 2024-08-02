@@ -1,8 +1,8 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error';
-import { InMemoryAnswerAttachmentsRepository } from '@/infra/repositories/in-memory-answer-attachments-repository';
-import { InMemoryAnswersRepository } from '@/infra/repositories/in-memory-answers-repository';
 import { makeAnswer } from 'test/factories/make-answer';
+import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository';
+import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository';
 import { describe, expect, test } from 'vitest';
 import { DeleteAnswerUseCase } from './delete-answer';
 

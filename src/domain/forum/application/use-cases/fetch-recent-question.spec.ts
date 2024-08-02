@@ -1,6 +1,6 @@
-import { InMemoryQuestionAttachmentsRepository } from '@/infra/repositories/in-memory-question-attachments-repository';
-import { InMemoryQuestionsRepository } from '@/infra/repositories/in-memory-question-repository';
 import { makeQuestion } from 'test/factories/make-question';
+import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository';
+import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-question-repository';
 import { describe, expect, test } from 'vitest';
 import { FetRecentQuestionUseCase } from './fetch-recent-questions';
 

@@ -1,6 +1,6 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
-import { InMemoryQuestionCommentsRepository } from '@/infra/repositories/in-memory-question-comments-repository';
 import { makeQuestionComment } from 'test/factories/make-question-comment';
+import { InMemoryQuestionCommentsRepository } from 'test/repositories/in-memory-question-comments-repository';
 import { describe, expect, test } from 'vitest';
 import { FetQuestionCommentUseCase } from './fetch-question-comments';
 

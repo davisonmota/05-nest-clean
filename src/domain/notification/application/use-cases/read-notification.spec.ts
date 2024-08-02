@@ -1,6 +1,6 @@
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error ';
-import { InMemoryNotificationsRepository } from '@/infra/repositories/in-memory-notifications-repository';
 import { makeNotification } from 'test/factories/make-notification';
+import { InMemoryNotificationsRepository } from 'test/repositories/in-memory-notifications-repository';
 import { describe, expect, test } from 'vitest';
 import { ReadNotificationUseCase } from './read-notification';
 

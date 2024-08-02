@@ -1,5 +1,5 @@
-import { InMemoryAnswerAttachmentsRepository } from '@/infra/repositories/in-memory-answer-attachments-repository';
-import { InMemoryAnswersRepository } from '@/infra/repositories/in-memory-answers-repository';
+import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository';
+import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository';
 import { describe, expect, test } from 'vitest';
 import { AnswerQuestionsUseCase } from './answer-questions';
 
