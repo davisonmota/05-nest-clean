@@ -2,7 +2,7 @@ import { makeQuestion } from 'test/factories/make-question';
 import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-question-repository';
 import { describe, expect, test } from 'vitest';
-import { FetRecentQuestionUseCase } from './fetch-recent-questions';
+import { FetchRecentQuestionUseCase } from './fetch-recent-questions';
 
 describe('Fetch Recente Question Use Case', () => {
   test('should be able to fetch recent questions', async () => {
@@ -11,7 +11,7 @@ describe('Fetch Recente Question Use Case', () => {
     const inMemoryRepositoryQuestions = new InMemoryQuestionsRepository(
       questionAttachmentsRepository,
     );
-    const fetchRecentQuestionsUseCase = new FetRecentQuestionUseCase(
+    const fetchRecentQuestionsUseCase = new FetchRecentQuestionUseCase(
       inMemoryRepositoryQuestions,
     );
 
@@ -48,7 +48,7 @@ describe('Fetch Recente Question Use Case', () => {
     const inMemoryRepositoryQuestions = new InMemoryQuestionsRepository(
       questionAttachmentsRepository,
     );
-    const fetchRecentQuestionsUseCase = new FetRecentQuestionUseCase(
+    const fetchRecentQuestionsUseCase = new FetchRecentQuestionUseCase(
       inMemoryRepositoryQuestions,
     );
 

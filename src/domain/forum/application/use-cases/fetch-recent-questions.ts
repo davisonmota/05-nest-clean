@@ -1,4 +1,5 @@
 import { Either, right } from '@/core/either';
+import { Injectable } from '@nestjs/common';
 import { QuestionsRepository } from '../repositories/questions-repository';
 
 type Input = {
@@ -12,8 +13,8 @@ type QuestionDTO = {
   content: string;
   authorId: string;
   createdAt: Date;
-  getBestAnswerId?: string;
-  getUpdatedAt?: Date;
+  bestAnswerId?: string;
+  updatedAt?: Date;
   isNew: boolean;
 };
 
@@ -24,7 +25,8 @@ type Output = Either<
   }
 >;
 
-export class FetRecentQuestionUseCase {
+@Injectable()
+export class FetchRecentQuestionUseCase {
   constructor(private readonly questionsRepository: QuestionsRepository) {}
 
   async execute({ page }: Input): Promise<Output> {
@@ -38,8 +40,8 @@ export class FetRecentQuestionUseCase {
         content: question.getContent(),
         slug: question.getSlug(),
         createdAt: question.getCreatedAt(),
-        getUpdatedAt: question.getUpdatedAt(),
-        getBestAnswerId: question.getBestAnswerId(),
+        updatedAt: question.getUpdatedAt(),
+        bestAnswerId: question.getBestAnswerId(),
         isNew: question.isNew(),
       };
     });

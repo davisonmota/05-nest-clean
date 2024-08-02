@@ -10,8 +10,8 @@ import { PrismaQuestionsRepository } from './prisma/repositories/prisma-question
 
 @Module({
   providers: [
-    PrismaAnswersRepository,
     PrismaService,
+    PrismaAnswersRepository,
     PrismaAnswerAttachmentsRepository,
     PrismaAnswerCommentsRepository,
     { provide: QuestionsRepository, useClass: PrismaQuestionsRepository },
