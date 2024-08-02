@@ -1,17 +1,20 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { PaginationParams } from '@/core/repositories/pagination-params';
 import { DomainEvents } from '@/domain/events/domain-events';
-import { QuestionAttachmentsRepository } from '@/domain/forum/application/repositories/question-attachments-repository';
 import { QuestionsRepository } from '@/domain/forum/application/repositories/questions-repository';
 import { Question } from '@/domain/forum/enterprise/entities/question';
 import { Injectable } from '@nestjs/common';
+import { PrismaQuestionMapper } from '../mappers/prisma-question-mapper';
+import { PrismaService } from '../prisma.service';
+import { PrismaQuestionAttachmentsRepository } from './prisma-question-attachments-repository';
 
 @Injectable()
 export class PrismaQuestionsRepository implements QuestionsRepository {
   readonly items: Question[] = [];
 
   constructor(
-    private questionAttachmentsRepository: QuestionAttachmentsRepository,
+    private prismaService: PrismaService,
+    private questionAttachmentsRepository: PrismaQuestionAttachmentsRepository,
   ) {}
 
   async create(question: Question): Promise<void> {
@@ -40,11 +43,14 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
   }
 
   async findById(id: string): Promise<Question | null> {
-    const question = this.items.find((item) => item.getId() === id);
+    const questionData = await this.prismaService.question.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!questionData) return null;
 
-    if (!question) return null;
-
-    return question;
+    return PrismaQuestionMapper.toDomain(questionData);
   }
 
   async findManyRecent({ page }: PaginationParams): Promise<Question[]> {

@@ -9,22 +9,22 @@ import { PrismaQuestionsRepository } from './prisma/repositories/prisma-question
 
 @Module({
   providers: [
+    PrismaAnswersRepository,
     PrismaService,
     PrismaAnswerAttachmentsRepository,
     PrismaAnswerCommentsRepository,
-    PrismaAnswersRepository,
+    PrismaQuestionsRepository,
     PrismaQuestionAttachmentsRepository,
     PrismaQuestionCommentsRepository,
-    PrismaQuestionsRepository,
   ],
   exports: [
     PrismaService,
+    PrismaAnswersRepository,
     PrismaAnswerAttachmentsRepository,
     PrismaAnswerCommentsRepository,
-    PrismaAnswersRepository,
+    PrismaQuestionsRepository,
     PrismaQuestionAttachmentsRepository,
     PrismaQuestionCommentsRepository,
-    PrismaQuestionsRepository,
   ],
 })
 export class DatabaseModule {}

@@ -1,17 +1,17 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { PaginationParams } from '@/core/repositories/pagination-params';
 import { DomainEvents } from '@/domain/events/domain-events';
-import { AnswerAttachmentsRepository } from '@/domain/forum/application/repositories/answer-attachments-repository';
 import { AnswersRepository } from '@/domain/forum/application/repositories/answers-repository';
 import { Answer } from '@/domain/forum/enterprise/entities/answer';
 import { Injectable } from '@nestjs/common';
+import { PrismaAnswerAttachmentsRepository } from './prisma-answer-attachments-repository';
 
 @Injectable()
 export class PrismaAnswersRepository implements AnswersRepository {
   readonly items: Answer[] = [];
 
   constructor(
-    private answerAttachmentsRepository: AnswerAttachmentsRepository,
+    private answerAttachmentsRepository: PrismaAnswerAttachmentsRepository,
   ) {}
 
   async create(answer: Answer): Promise<void> {

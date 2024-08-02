@@ -6,12 +6,12 @@ import { HttpModule } from './http/http.module';
 
 @Module({
   imports: [
+    HttpModule,
+    AuthModule,
     ConfigModule.forRoot({
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
     }),
-    AuthModule,
-    HttpModule,
   ],
 })
 export class AppModule {}
