@@ -1,9 +1,8 @@
+import { CreateQuestionUseCase } from '@/domain/forum/application/use-cases/create-question';
 import { CurrentUser } from '@/infra/auth/current-user-decorator';
 import { JwtAuthGuard } from '@/infra/auth/jwt-auth.guard';
 import { UserPayload } from '@/infra/auth/jwt.strategy';
-import { PrismaService } from '@/infra/database/prisma/prisma.service';
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { z } from 'zod';
 import { ZodValidationPipe } from '../pipes/zod-validation-pipe';
 
@@ -17,10 +16,7 @@ type CreateQuestionBodySchema = z.infer<typeof createQuestionBodySchema>;
 @Controller('/questions')
 @UseGuards(JwtAuthGuard)
 export class CreateQuestionController {
-  constructor(
-    private readonly swtService: JwtService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly createQuestion: CreateQuestionUseCase) {}
 
   @Post()
   async handle(
@@ -29,27 +25,12 @@ export class CreateQuestionController {
     { title, content }: CreateQuestionBodySchema,
   ) {
     const userId = user.sub;
-    const slug = this.converteToSlug(title);
 
-    await this.prismaService.question.create({
-      data: {
-        title,
-        content,
-        slug,
-        authorId: userId,
-      },
+    await this.createQuestion.execute({
+      title,
+      content,
+      authorId: userId,
+      attachmentsIds: [],
     });
-  }
-
-  private converteToSlug(title: string) {
-    return title
-      .normalize('NFKD')
-      .toLocaleLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w]+/g, '-')
-      .replace(/_/g, '-')
-      .replace(/--/g, '-')
-      .replace(/-$/g, '');
   }
 }
