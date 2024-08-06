@@ -10,8 +10,6 @@ import { PrismaQuestionAttachmentsRepository } from './prisma-question-attachmen
 
 @Injectable()
 export class PrismaQuestionsRepository implements QuestionsRepository {
-  readonly items: Question[] = [];
-
   constructor(
     private prismaService: PrismaService,
     private questionAttachmentsRepository: PrismaQuestionAttachmentsRepository,
@@ -77,13 +75,11 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
   }
 
   async delete(question: Question): Promise<void> {
-    const indexItem = this.items.findIndex(
-      (item) => item.getId() === question.getId(),
-    );
-    this.items.splice(indexItem, 1);
-
-    await this.questionAttachmentsRepository.deleteManyByQuestionId(
-      question.getId(),
-    );
+    const questionData = PrismaQuestionMapper.toPrisma(question);
+    await this.prismaService.question.delete({
+      where: {
+        id: questionData.id,
+      },
+    });
   }
 }
