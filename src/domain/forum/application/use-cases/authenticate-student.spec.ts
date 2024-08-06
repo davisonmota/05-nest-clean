@@ -37,21 +37,9 @@ describe('Authenticate Student Use Case', () => {
       password: '123',
     });
 
-    console.log(result.value);
     expect(result.isRight()).toBe(true);
     expect(result.value).toEqual({
       accessToken: expect.any(String),
     });
   });
-
-  // test('deve criptografar (hash) a senha do estudante (student) ao registrá-lo', async () => {
-  //   await sut.execute({
-  //     name: 'Dávison',
-  //     email: 'davison@gmail.com',
-  //     password: '123',
-  //   });
-  //   expect(inMemoryStudentsRepository.items[0].getPassword()).toBe(
-  //     '123-hashed',
-  //   );
-  // });
 });
