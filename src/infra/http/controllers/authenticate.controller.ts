@@ -1,5 +1,13 @@
 import { AuthenticateStudentUseCase } from '@/domain/forum/application/use-cases/authenticate-student';
-import { Body, Controller, Post, UsePipes } from '@nestjs/common';
+import { WrongCredentialsError } from '@/domain/forum/application/use-cases/errors/wrong-credentials-error';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Post,
+  UnauthorizedException,
+  UsePipes,
+} from '@nestjs/common';
 import { z } from 'zod';
 import { ZodValidationPipe } from '../pipes/zod-validation-pipe';
 
@@ -21,7 +29,14 @@ export class AuthenticateController {
   async handle(@Body() { email, password }: authenticateBodySchema) {
     const result = await this.authenticateStudent.execute({ email, password });
     if (result.isLeft()) {
-      throw new Error();
+      const error = result.value;
+
+      switch (error.constructor) {
+        case WrongCredentialsError:
+          throw new UnauthorizedException(error.message);
+        default:
+          throw new BadRequestException(error.message);
+      }
     }
     const { accessToken } = result.value;
     return { accessToken };
