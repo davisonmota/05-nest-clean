@@ -1,54 +1,49 @@
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Slug } from '@/domain/forum/enterprise/entities/Slug';
 import { AppModule } from '@/infra/app.module';
-import { PrismaService } from '@/infra/database/prisma/prisma.service';
+import { DatabaseModule } from '@/infra/database/database.module';
 import { INestApplication } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
+import { QuestionFactory } from 'test/factories/make-question';
+import { StudentFactory } from 'test/factories/make-student';
 
 describe('Fetch Recent Question (e2e)', () => {
   let app: INestApplication;
-  let prismaService: PrismaService;
   let jwtService: JwtService;
+  let studentFactory: StudentFactory;
+  let questionFactory: QuestionFactory;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, DatabaseModule],
+      providers: [StudentFactory, QuestionFactory],
     }).compile();
 
     app = moduleRef.createNestApplication();
-    prismaService = moduleRef.get(PrismaService);
+    studentFactory = moduleRef.get(StudentFactory);
+    questionFactory = moduleRef.get(QuestionFactory);
     jwtService = moduleRef.get(JwtService);
 
     await app.init();
   });
 
   test('[GET] /questions: Deve listar as perguntas recentes (questions)', async () => {
-    const user = await prismaService.user.create({
-      data: {
-        name: 'Dávison',
-        email: 'contato@davison.com',
-        password: '123',
-      },
-    });
+    const user = await studentFactory.makePrismaStudent();
 
-    const accessToken = await jwtService.sign({ sub: user.id });
+    const accessToken = jwtService.sign({ sub: user.getId() });
 
-    await prismaService.question.createMany({
-      data: [
-        {
-          title: 'Question 01',
-          slug: 'question-01',
-          content: 'Content question 01',
-          authorId: user.id,
-        },
-        {
-          title: 'Question 02',
-          slug: 'question-02',
-          content: 'Content question 02',
-          authorId: user.id,
-        },
-      ],
-    });
+    await Promise.all([
+      questionFactory.makePrismaQuestion({
+        authorId: new UniqueEntityID(user.getId()),
+        slug: new Slug('question-01'),
+      }),
+      questionFactory.makePrismaQuestion({
+        authorId: new UniqueEntityID(user.getId()),
+        slug: new Slug('question-02'),
+      }),
+    ]);
 
     const response = await request(app.getHttpServer())
       .get('/questions')
@@ -57,8 +52,8 @@ describe('Fetch Recent Question (e2e)', () => {
 
     expect(response.body).toEqual({
       questions: [
-        expect.objectContaining({ title: 'Question 01', slug: 'question-01' }),
-        expect.objectContaining({ title: 'Question 02', slug: 'question-02' }),
+        expect.objectContaining({ slug: 'question-02' }),
+        expect.objectContaining({ slug: 'question-01' }),
       ],
     });
   });

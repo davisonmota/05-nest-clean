@@ -2,7 +2,6 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { Slug } from '@/domain/forum/enterprise/entities/Slug';
 import { AppModule } from '@/infra/app.module';
 import { DatabaseModule } from '@/infra/database/database.module';
-import { PrismaService } from '@/infra/database/prisma/prisma.service';
 import { INestApplication } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
@@ -15,7 +14,6 @@ describe('Get Question By Slug (e2e)', () => {
   let jwtService: JwtService;
   let studentFactory: StudentFactory;
   let questionFactory: QuestionFactory;
-  let prismaService: PrismaService;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -24,7 +22,6 @@ describe('Get Question By Slug (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-    prismaService = moduleRef.get(PrismaService);
     studentFactory = moduleRef.get(StudentFactory);
     questionFactory = moduleRef.get(QuestionFactory);
     jwtService = moduleRef.get(JwtService);
