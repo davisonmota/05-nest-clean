@@ -3,7 +3,6 @@ import { Student } from '@/domain/forum/enterprise/entities/student';
 import { Injectable } from '@nestjs/common';
 import { PrismaStudentMapper } from '../mappers/prisma-student-mapper';
 import { PrismaService } from '../prisma.service';
-('');
 
 @Injectable()
 export class PrismaStudentsRepository implements StudentsRepository {
