@@ -6,14 +6,10 @@ import { Question } from '@/domain/forum/enterprise/entities/question';
 import { Injectable } from '@nestjs/common';
 import { PrismaQuestionMapper } from '../mappers/prisma-question-mapper';
 import { PrismaService } from '../prisma.service';
-import { PrismaQuestionAttachmentsRepository } from './prisma-question-attachments-repository';
 
 @Injectable()
 export class PrismaQuestionsRepository implements QuestionsRepository {
-  constructor(
-    private prismaService: PrismaService,
-    private questionAttachmentsRepository: PrismaQuestionAttachmentsRepository,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
   async create(question: Question): Promise<void> {
     const questionData = PrismaQuestionMapper.toPrisma(question);
@@ -75,10 +71,9 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
   }
 
   async delete(question: Question): Promise<void> {
-    const questionData = PrismaQuestionMapper.toPrisma(question);
     await this.prismaService.question.delete({
       where: {
-        id: questionData.id,
+        id: question.getId(),
       },
     });
   }
