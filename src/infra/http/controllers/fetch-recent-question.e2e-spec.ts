@@ -29,7 +29,7 @@ describe('Fetch Recent Question (e2e)', () => {
     await app.init();
   });
 
-  test('[GET] /questions: Deve listar as perguntas recentes (questions)', async () => {
+  test('[GET] /questions - Deve listar as perguntas recentes (questions)', async () => {
     const user = await studentFactory.makePrismaStudent();
 
     const accessToken = jwtService.sign({ sub: user.getId() });

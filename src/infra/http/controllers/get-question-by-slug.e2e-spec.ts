@@ -29,7 +29,7 @@ describe('Get Question By Slug (e2e)', () => {
     await app.init();
   });
 
-  test('[GET] /question/:slugs Deve pegar um comentário de uma pergunta pelo slug', async () => {
+  test('[GET] /question/:slugs - Deve pegar um comentário de uma pergunta pelo slug', async () => {
     const user = await studentFactory.makePrismaStudent();
 
     const accessToken = jwtService.sign({ sub: user.getId() });

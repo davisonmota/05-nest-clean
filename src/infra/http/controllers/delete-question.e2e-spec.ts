@@ -9,7 +9,7 @@ import request from 'supertest';
 import { QuestionFactory } from 'test/factories/make-question';
 import { StudentFactory } from 'test/factories/make-student';
 
-describe('Edit Question (e2e)', () => {
+describe('Delete Question (e2e)', () => {
   let app: INestApplication;
   let jwtService: JwtService;
   let prismaService: PrismaService;
@@ -31,7 +31,7 @@ describe('Edit Question (e2e)', () => {
     await app.init();
   });
 
-  test('[PUT] /questions/:id - Deve editar uma pergunta (question)', async () => {
+  test('[DELETE] /questions/:id - Deve deletar uma pergunta (question)', async () => {
     const user = await studentFactory.makePrismaStudent();
 
     const accessToken = jwtService.sign({ sub: user.getId() });
@@ -43,23 +43,18 @@ describe('Edit Question (e2e)', () => {
     const questionId = question.getId();
 
     await request(app.getHttpServer())
-      .put(`/questions/${questionId}`)
+      .delete(`/questions/${questionId}`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        title: 'Edit New Question',
-        content: 'Edit Content question',
-      })
+      .send()
       .expect(204);
 
-    const questionOnDatabase = await prismaService.question.findFirst({
+    const questionOnDatabase = await prismaService.question.findUnique({
       where: {
         id: questionId,
-        title: 'Edit New Question',
-        content: 'Edit Content question',
       },
     });
 
-    expect(questionOnDatabase).toBeTruthy();
+    expect(questionOnDatabase).toBeNull();
   });
 
   afterAll(async () => {
