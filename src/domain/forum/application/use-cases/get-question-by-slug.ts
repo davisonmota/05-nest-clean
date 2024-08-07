@@ -1,5 +1,7 @@
 import { Either, left, right } from '@/core/either';
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error';
+import { Injectable } from '@nestjs/common';
+import { Question } from '../../enterprise/entities/question';
 import { QuestionsRepository } from '../repositories/questions-repository';
 
 type Input = {
@@ -9,17 +11,11 @@ type Input = {
 type Output = Either<
   ResourceNotFoundError,
   {
-    question: {
-      id: string;
-      title: string;
-      slug: string;
-      content: string;
-      authorId: string;
-      createdAt: Date;
-    };
+    question: Question;
   }
 >;
 
+@Injectable()
 export class GetQuestionBySlugUseCase {
   constructor(private readonly questionsRepository: QuestionsRepository) {}
 
@@ -30,15 +26,6 @@ export class GetQuestionBySlugUseCase {
       return left(new ResourceNotFoundError());
     }
 
-    return right({
-      question: {
-        id: question.getId(),
-        authorId: question.getAuthorId(),
-        title: question.getTitle(),
-        content: question.getContent(),
-        slug: question.getSlug(),
-        createdAt: question.getCreatedAt(),
-      },
-    });
+    return right({ question });
   }
 }

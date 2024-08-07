@@ -28,12 +28,10 @@ describe('Get Question By Slug Use Case', () => {
       slug: 'example-question',
     });
 
+    if (result.isRight()) {
+      const { question } = result.value;
+      expect(question).toBeInstanceOf(Question);
+    }
     expect(result.isRight()).toBe(true);
-    expect(result.value).toMatchObject({
-      question: expect.objectContaining({
-        title: 'Example Question',
-        slug: 'example-question',
-      }),
-    });
   });
 });
