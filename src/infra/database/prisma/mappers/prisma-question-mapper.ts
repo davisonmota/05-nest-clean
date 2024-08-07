@@ -15,7 +15,7 @@ export class PrismaQuestionMapper {
           ? new UniqueEntityID(questionData.bestAnswerId)
           : undefined,
         createdAt: questionData.createdAt,
-        updatedAt: questionData.createdAt ?? undefined,
+        updatedAt: questionData.createdAt,
       },
       new UniqueEntityID(questionData.id),
     );
