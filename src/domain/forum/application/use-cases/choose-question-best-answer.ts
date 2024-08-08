@@ -2,6 +2,7 @@ import { Either, left, right } from '@/core/either';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error ';
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error';
+import { Injectable } from '@nestjs/common';
 import { AnswersRepository } from '../repositories/answers-repository';
 import { QuestionsRepository } from '../repositories/questions-repository';
 
@@ -25,6 +26,7 @@ type Output = Either<
   }
 >;
 
+@Injectable()
 export class ChooseQuestionBestAnswerUseCase {
   constructor(
     private readonly questionsRepository: QuestionsRepository,
@@ -44,7 +46,7 @@ export class ChooseQuestionBestAnswerUseCase {
       return left(new ResourceNotFoundError());
     }
 
-    if (question.getId() !== userId) {
+    if (question.getAuthorId() !== userId) {
       return left(new NotAllowedError());
     }
 
