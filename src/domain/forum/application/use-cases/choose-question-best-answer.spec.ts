@@ -36,7 +36,7 @@ describe('Choose Question Best Answer Use Case', () => {
     await inMemoryAnswersRepository.create(answer);
 
     await chooseQuestionBestAnswerUseCase.execute({
-      userId: question.getId(),
+      userId: question.getAuthorId(),
       answerId: answer.getId(),
     });
 
