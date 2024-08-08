@@ -1,4 +1,6 @@
 import { Either, right } from '@/core/either';
+import { Injectable } from '@nestjs/common';
+import { Answer } from '../../enterprise/entities/answer';
 import { AnswersRepository } from '../repositories/answers-repository';
 
 type Input = {
@@ -6,22 +8,15 @@ type Input = {
   page: number;
 };
 
-type AnswersDTO = {
-  authorId: string;
-  questionId: string;
-  content: string;
-  createdAt: Date;
-  updatedAt?: Date;
-};
-
 type Output = Either<
   null,
   {
-    answers: AnswersDTO[];
+    answers: Answer[];
   }
 >;
 
-export class FetQuestionAnswersUseCase {
+@Injectable()
+export class FetchQuestionAnswersUseCase {
   constructor(private readonly answerRepository: AnswersRepository) {}
 
   async execute({ questionId, page }: Input): Promise<Output> {
@@ -32,18 +27,8 @@ export class FetQuestionAnswersUseCase {
       },
     );
 
-    const answersDTO: AnswersDTO[] = answers.map((answer) => {
-      return {
-        authorId: answer.getAuthorId(),
-        questionId: answer.getQuestionId(),
-        content: answer.getContent(),
-        createdAt: answer.getCreatedAt(),
-        updatedAt: answer.getUpdatedAt(),
-      };
-    });
-
     return right({
-      answers: answersDTO,
+      answers,
     });
   }
 }

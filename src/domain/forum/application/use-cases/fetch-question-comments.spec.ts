@@ -8,7 +8,7 @@ describe('Fetch Question Comments Use Case', () => {
   test('should be able to fetch question comments', async () => {
     const inMemoryQuestionCommentsRepository =
       new InMemoryQuestionCommentsRepository();
-    const fetQuestionAnswersUseCase = new FetQuestionCommentUseCase(
+    const FetchQuestionAnswersUseCase = new FetQuestionCommentUseCase(
       inMemoryQuestionCommentsRepository,
     );
 
@@ -28,7 +28,7 @@ describe('Fetch Question Comments Use Case', () => {
       }),
     );
 
-    const result = await fetQuestionAnswersUseCase.execute({
+    const result = await FetchQuestionAnswersUseCase.execute({
       page: 1,
       questionId: 'question-id',
     });
@@ -39,7 +39,7 @@ describe('Fetch Question Comments Use Case', () => {
   test('should be able to fetch paginated question answers', async () => {
     const inMemoryQuestionCommentsRepository =
       new InMemoryQuestionCommentsRepository();
-    const fetQuestionAnswersUseCase = new FetQuestionCommentUseCase(
+    const FetchQuestionAnswersUseCase = new FetQuestionCommentUseCase(
       inMemoryQuestionCommentsRepository,
     );
     for (let i = 1; i <= 25; i++) {
@@ -50,7 +50,7 @@ describe('Fetch Question Comments Use Case', () => {
       );
     }
 
-    const result = await fetQuestionAnswersUseCase.execute({
+    const result = await FetchQuestionAnswersUseCase.execute({
       page: 2,
       questionId: 'question-id',
     });

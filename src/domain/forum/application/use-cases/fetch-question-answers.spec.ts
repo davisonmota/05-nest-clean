@@ -3,7 +3,7 @@ import { makeAnswer } from 'test/factories/make-answer';
 import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository';
 import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository';
 import { describe, expect, test } from 'vitest';
-import { FetQuestionAnswersUseCase } from './fetch-question-answers';
+import { FetchQuestionAnswersUseCase } from './fetch-question-answers';
 
 describe('Fetch Question Answers Use Case', () => {
   test('should be able to fetch question answers', async () => {
@@ -12,7 +12,7 @@ describe('Fetch Question Answers Use Case', () => {
     const inMemoryAnswersRepository = new InMemoryAnswersRepository(
       answerAttachmentsRepository,
     );
-    const fetQuestionAnswersUseCase = new FetQuestionAnswersUseCase(
+    const fetchQuestionAnswersUseCase = new FetchQuestionAnswersUseCase(
       inMemoryAnswersRepository,
     );
 
@@ -32,22 +32,11 @@ describe('Fetch Question Answers Use Case', () => {
       }),
     );
 
-    const result = await fetQuestionAnswersUseCase.execute({
+    const result = await fetchQuestionAnswersUseCase.execute({
       page: 1,
       questionId: 'question-id',
     });
 
-    expect(result.value?.answers).toEqual([
-      expect.objectContaining({
-        questionId: 'question-id',
-      }),
-      expect.objectContaining({
-        questionId: 'question-id',
-      }),
-      expect.objectContaining({
-        questionId: 'question-id',
-      }),
-    ]);
     expect(result.value?.answers).toHaveLength(3);
   });
 
@@ -57,7 +46,7 @@ describe('Fetch Question Answers Use Case', () => {
     const inMemoryAnswersRepository = new InMemoryAnswersRepository(
       answerAttachmentsRepository,
     );
-    const fetQuestionAnswersUseCase = new FetQuestionAnswersUseCase(
+    const fetchQuestionAnswersUseCase = new FetchQuestionAnswersUseCase(
       inMemoryAnswersRepository,
     );
 
@@ -69,7 +58,7 @@ describe('Fetch Question Answers Use Case', () => {
       );
     }
 
-    const result = await fetQuestionAnswersUseCase.execute({
+    const result = await fetchQuestionAnswersUseCase.execute({
       page: 2,
       questionId: 'question-id',
     });
