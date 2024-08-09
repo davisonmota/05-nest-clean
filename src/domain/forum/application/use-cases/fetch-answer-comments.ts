@@ -1,4 +1,6 @@
 import { Either, right } from '@/core/either';
+import { Injectable } from '@nestjs/common';
+import { AnswerComment } from '../../enterprise/entities/answer-comment';
 import { AnswerCommentsRepository } from '../repositories/answer-comments-repository';
 
 type Input = {
@@ -6,22 +8,14 @@ type Input = {
   page: number;
 };
 
-type AnswerCommentDTO = {
-  id: string;
-  authorId: string;
-  answerId: string;
-  content: string;
-  createdAt: Date;
-  updatedAt?: Date;
-};
-
 type Output = Either<
   null,
   {
-    answerComments: AnswerCommentDTO[];
+    answerComments: AnswerComment[];
   }
 >;
 
+@Injectable()
 export class FetAnswerCommentUseCase {
   constructor(
     private readonly answerCommentsRepository: AnswerCommentsRepository,
@@ -33,21 +27,8 @@ export class FetAnswerCommentUseCase {
         page,
       });
 
-    const answerCommentDTO: AnswerCommentDTO[] = answerComments.map(
-      (answerComment) => {
-        return {
-          id: answerComment.getId(),
-          authorId: answerComment.getAuthorId(),
-          answerId: answerComment.getAnswerId(),
-          content: answerComment.getContent(),
-          createdAt: answerComment.getCreatedAt(),
-          updatedAt: answerComment.getUpdatedAt(),
-        };
-      },
-    );
-
     return right({
-      answerComments: answerCommentDTO,
+      answerComments,
     });
   }
 }
