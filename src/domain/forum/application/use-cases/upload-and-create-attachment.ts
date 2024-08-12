@@ -2,7 +2,7 @@ import { Either, left, right } from '@/core/either';
 import { Injectable } from '@nestjs/common';
 import { Attachment } from '../../enterprise/entities/attachment';
 import { AttachmentsRepository } from '../repositories/attachment-repository';
-import { Uploader } from '../stotage/uploader';
+import { Uploader } from '../storage/uploader';
 import { InvalidAttachmentTypeError } from './errors/invalid-attachment-type-error';
 
 type Input = {

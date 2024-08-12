@@ -1,45 +1,51 @@
-import { FakeHasher } from 'test/cryptography/faker-hash';
-import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository';
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository';
+import { FakeUploader } from 'test/storage/fake-uploader';
 import { describe, test } from 'vitest';
-import { HashGenerator } from '../cryptography/hasher-generator';
-import { RegisterStudentUseCase } from './register-student';
+import { InvalidAttachmentTypeError } from './errors/invalid-attachment-type-error';
+import { UploadAndCreateAttachmentUseCase } from './upload-and-create-attachment';
 
-let inMemoryStudentsRepository: InMemoryStudentsRepository;
-let fakerHashGenerator: HashGenerator;
-let sut: RegisterStudentUseCase;
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository;
+let fakeUploader: FakeUploader;
+let sut: UploadAndCreateAttachmentUseCase;
 
-describe('Register Student Use Case', () => {
+describe('Upload and Create Attachment Use Case', () => {
   beforeEach(async () => {
-    inMemoryStudentsRepository = new InMemoryStudentsRepository();
-    fakerHashGenerator = new FakeHasher();
-    sut = new RegisterStudentUseCase(
-      inMemoryStudentsRepository,
-      fakerHashGenerator,
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository();
+    fakeUploader = new FakeUploader();
+    sut = new UploadAndCreateAttachmentUseCase(
+      inMemoryAttachmentsRepository,
+      fakeUploader,
     );
   });
 
-  test('deve registrar um estudante (student)', async () => {
+  test('deve criar e fazer upload de um anexo (attachment)', async () => {
     const result = await sut.execute({
-      name: 'Dávison',
-      email: 'davison@gmail.com',
-      password: '123',
+      fileName: 'profile.png',
+      fileType: 'image/png',
+      body: Buffer.from(''),
     });
 
     expect(result.isRight()).toBe(true);
     expect(result.value).toEqual({
-      student: inMemoryStudentsRepository.items[0],
+      attachment: inMemoryAttachmentsRepository.items[0],
     });
+    expect(fakeUploader.uploads).toHaveLength(1);
+    expect(fakeUploader.uploads[0]).toEqual(
+      expect.objectContaining({
+        fileName: 'profile.png',
+        url: expect.any(String),
+      }),
+    );
   });
 
-  test('deve criptografar (hash) a senha do estudante (student) ao registrá-lo', async () => {
-    await sut.execute({
-      name: 'Dávison',
-      email: 'davison@gmail.com',
-      password: '123',
+  test('não deve ser possível criar e fazer upload de um anexo (attachment) com fon formato inválido', async () => {
+    const result = await sut.execute({
+      fileName: 'profile.mp3',
+      fileType: 'audio/mpeg', // formatos válidos png, jpg, jpeg, pnd
+      body: Buffer.from(''),
     });
 
-    expect(inMemoryStudentsRepository.items[0].getPassword()).toBe(
-      '123-hashed',
-    );
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(InvalidAttachmentTypeError);
   });
 });
