@@ -14,6 +14,9 @@ export class InMemoryQuestionsRepository implements QuestionsRepository {
 
   async create(question: Question): Promise<void> {
     this.items.push(question);
+    this.questionAttachmentsRepository.createMany(
+      question.getAttachments().getItems(),
+    );
 
     DomainEvents.dispatchEventsForAggregate(
       new UniqueEntityID(question.getId()),
@@ -26,6 +29,13 @@ export class InMemoryQuestionsRepository implements QuestionsRepository {
     );
 
     this.items[questionIndex] = question;
+
+    this.questionAttachmentsRepository.createMany(
+      question.getAttachments().getNewItems(),
+    );
+    this.questionAttachmentsRepository.deleteMany(
+      question.getAttachments().getRemovedItems(),
+    );
     DomainEvents.dispatchEventsForAggregate(
       new UniqueEntityID(question.getId()),
     );

@@ -41,4 +41,25 @@ describe('Create Question Use Case', () => {
         .getAttachmentId(),
     ).toBe('2');
   });
+
+  test('deve persistir os anexos (attachments) quando uma nova uma dúvida (question) for criada', async () => {
+    const inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository();
+    const inMemoryRepositoryQuestions = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    );
+    const answerQuestion = new CreateQuestionUseCase(
+      inMemoryRepositoryQuestions,
+    );
+
+    const result = await answerQuestion.execute({
+      authorId: '1',
+      title: 'Nova dúvida (question)',
+      content: 'Criando uma nova dúvida (question)',
+      attachmentsIds: ['1', '2'],
+    });
+
+    expect(result.isRight()).toBe(true);
+    expect(inMemoryQuestionAttachmentsRepository.items).toHaveLength(2);
+  });
 });

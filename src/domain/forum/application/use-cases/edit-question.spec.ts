@@ -105,4 +105,57 @@ describe('Edit Question Use Case', () => {
     expect(result.isLeft()).toBe(true);
     expect(result.value).toBeInstanceOf(NotAllowedError);
   });
+
+  test('deve sincronizar os anexos (attachments) removidos e editados de uma dúvida (question)', async () => {
+    const inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository();
+    const inMemoryRepositoryQuestions = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    );
+
+    const editQuestion = new EditQuestionUseCase(
+      inMemoryRepositoryQuestions,
+      inMemoryQuestionAttachmentsRepository,
+    );
+
+    const newQuestion = makeQuestion(
+      {
+        authorId: new UniqueEntityID('user-id'),
+      },
+      new UniqueEntityID('id-question'),
+    );
+
+    await inMemoryRepositoryQuestions.create(newQuestion);
+
+    inMemoryQuestionAttachmentsRepository.items.push(
+      makeQuestionAttachment({
+        questionId: new UniqueEntityID(newQuestion.getId()),
+        attachmentId: new UniqueEntityID('1'),
+      }),
+    );
+
+    inMemoryQuestionAttachmentsRepository.items.push(
+      makeQuestionAttachment({
+        questionId: new UniqueEntityID(newQuestion.getId()),
+        attachmentId: new UniqueEntityID('2'),
+      }),
+    );
+
+    const result = await editQuestion.execute({
+      userId: 'user-id',
+      questionId: 'id-question',
+      title: 'New title edited',
+      content: 'New content edited',
+      attachmentsIds: ['1', '3'],
+    });
+
+    expect(result.isRight()).toBe(true);
+    expect(inMemoryQuestionAttachmentsRepository.items).toHaveLength(2);
+    expect(
+      inMemoryQuestionAttachmentsRepository.items[0].getAttachmentId(),
+    ).toBe('1');
+    expect(
+      inMemoryQuestionAttachmentsRepository.items[1].getAttachmentId(),
+    ).toBe('3');
+  });
 });
