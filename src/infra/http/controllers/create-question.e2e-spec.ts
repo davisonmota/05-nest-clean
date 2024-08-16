@@ -29,7 +29,7 @@ describe('Create Question (e2e)', () => {
   });
 
   test('[POST] /questions: Deve criar uma pergunta (question)', async () => {
-    const user = await await studentFactory.makePrismaStudent();
+    const user = await studentFactory.makePrismaStudent();
 
     const accessToken = jwtService.sign({ sub: user.getId() });
 

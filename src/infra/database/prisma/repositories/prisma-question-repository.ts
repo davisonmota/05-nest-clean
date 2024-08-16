@@ -1,6 +1,7 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { PaginationParams } from '@/core/repositories/pagination-params';
 import { DomainEvents } from '@/domain/events/domain-events';
+import { QuestionAttachmentsRepository } from '@/domain/forum/application/repositories/question-attachments-repository';
 import { QuestionsRepository } from '@/domain/forum/application/repositories/questions-repository';
 import { Question } from '@/domain/forum/enterprise/entities/question';
 import { Injectable } from '@nestjs/common';
@@ -9,13 +10,20 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PrismaQuestionsRepository implements QuestionsRepository {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private questionAttachmentsRepository: QuestionAttachmentsRepository,
+  ) {}
 
   async create(question: Question): Promise<void> {
     const questionData = PrismaQuestionMapper.toPrisma(question);
     await this.prismaService.question.create({
       data: questionData,
     });
+
+    await this.questionAttachmentsRepository.createMany(
+      question.getAttachments().getItems(),
+    );
 
     DomainEvents.dispatchEventsForAggregate(
       new UniqueEntityID(question.getId()),
@@ -24,12 +32,20 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
 
   async save(question: Question): Promise<void> {
     const questionData = PrismaQuestionMapper.toPrisma(question);
-    await this.prismaService.question.update({
-      where: {
-        id: question.getId(),
-      },
-      data: questionData,
-    });
+    await Promise.all([
+      this.prismaService.question.update({
+        where: {
+          id: question.getId(),
+        },
+        data: questionData,
+      }),
+      this.questionAttachmentsRepository.createMany(
+        question.getAttachments().getNewItems(),
+      ),
+      this.questionAttachmentsRepository.deleteMany(
+        question.getAttachments().getRemovedItems(),
+      ),
+    ]);
 
     DomainEvents.dispatchEventsForAggregate(
       new UniqueEntityID(question.getId()),
