@@ -3,6 +3,8 @@ import {
   QuestionAttachment,
   QuestionAttachmentProps,
 } from '@/domain/forum/enterprise/entities/question-attachment';
+import { PrismaService } from '@/infra/database/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
 
 export function makeQuestionAttachment(
   override: Partial<QuestionAttachmentProps> = {},
@@ -17,4 +19,26 @@ export function makeQuestionAttachment(
     id,
   );
   return questionAttachment;
+}
+
+@Injectable()
+export class QuestionAttachmentFactory {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async makePrismaQuestionAttachment(
+    data: Partial<QuestionAttachmentProps> = {},
+  ): Promise<QuestionAttachment> {
+    const questionAttachment = makeQuestionAttachment(data);
+
+    await this.prismaService.attachment.update({
+      where: {
+        id: questionAttachment.getAttachmentId(),
+      },
+      data: {
+        questionId: questionAttachment.getQuestionId(),
+      },
+    });
+
+    return questionAttachment;
+  }
 }
