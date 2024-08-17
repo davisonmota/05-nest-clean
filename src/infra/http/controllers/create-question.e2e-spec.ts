@@ -5,6 +5,7 @@ import { INestApplication } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
+import { AttachmentFactory } from 'test/factories/make-attachment';
 import { QuestionFactory } from 'test/factories/make-question';
 import { StudentFactory } from 'test/factories/make-student';
 
@@ -13,16 +14,18 @@ describe('Create Question (e2e)', () => {
   let jwtService: JwtService;
   let prismaService: PrismaService;
   let studentFactory: StudentFactory;
+  let attachmentFactory: AttachmentFactory;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [StudentFactory, QuestionFactory],
+      providers: [StudentFactory, QuestionFactory, AttachmentFactory],
     }).compile();
 
     app = moduleRef.createNestApplication();
     studentFactory = moduleRef.get(StudentFactory);
     jwtService = moduleRef.get(JwtService);
+    attachmentFactory = moduleRef.get(AttachmentFactory);
     prismaService = moduleRef.get(PrismaService);
 
     await app.init();
@@ -33,12 +36,18 @@ describe('Create Question (e2e)', () => {
 
     const accessToken = jwtService.sign({ sub: user.getId() });
 
+    const [attachment1, attachment2] = await Promise.all([
+      attachmentFactory.makePrismaAttachment(),
+      attachmentFactory.makePrismaAttachment(),
+    ]);
+
     await request(app.getHttpServer())
       .post('/questions')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         title: 'Create New Question',
         content: 'Content question',
+        attachmentsIds: [attachment1.getId(), attachment2.getId()],
       })
       .expect(201);
 
@@ -47,8 +56,15 @@ describe('Create Question (e2e)', () => {
         title: 'Create New Question',
       },
     });
-
     expect(questionOnDatabase).toBeTruthy();
+
+    const attachmentOnDatabase = await prismaService.attachment.findMany({
+      where: {
+        questionId: questionOnDatabase?.id,
+      },
+    });
+
+    expect(attachmentOnDatabase).toHaveLength(2);
   });
 
   afterAll(async () => {
