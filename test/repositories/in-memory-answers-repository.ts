@@ -14,6 +14,10 @@ export class InMemoryAnswersRepository implements AnswersRepository {
 
   async create(answer: Answer): Promise<void> {
     this.items.push(answer);
+    this.answerAttachmentsRepository.createMany(
+      answer.getAttachments().getItems(),
+    );
+
     DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(answer.getId()));
   }
 
@@ -23,6 +27,14 @@ export class InMemoryAnswersRepository implements AnswersRepository {
     );
 
     this.items[answerIndex] = answer;
+
+    this.answerAttachmentsRepository.createMany(
+      answer.getAttachments().getNewItems(),
+    );
+    this.answerAttachmentsRepository.deleteMany(
+      answer.getAttachments().getRemovedItems(),
+    );
+
     DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(answer.getId()));
   }
 

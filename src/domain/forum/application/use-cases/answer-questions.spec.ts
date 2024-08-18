@@ -15,7 +15,7 @@ describe('Answer Question Use Case', () => {
     );
 
     const outputAnswerQuestion = await answerQuestion.execute({
-      instructorId: '1',
+      authorId: '1',
       questionId: '1',
       content: 'Nova resposta para a dúvida do aluno',
       attachmentsIds: ['1', '2'],
@@ -39,5 +39,26 @@ describe('Answer Question Use Case', () => {
         .getItems()[1]
         .getAttachmentId(),
     ).toBe('2');
+  });
+
+  test('deve persistir os anexos (attachments) quando uma nova uma pergunta (answer) for criada', async () => {
+    const inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+    const inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository,
+    );
+    const answerQuestion = new AnswerQuestionsUseCase(
+      inMemoryAnswersRepository,
+    );
+
+    const result = await answerQuestion.execute({
+      authorId: '1',
+      questionId: '1',
+      content: 'Criando uma nova resposta (answer)',
+      attachmentsIds: ['1', '2'],
+    });
+
+    expect(result.isRight()).toBe(true);
+    expect(inMemoryAnswerAttachmentsRepository.items).toHaveLength(2);
   });
 });

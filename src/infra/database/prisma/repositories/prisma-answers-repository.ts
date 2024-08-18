@@ -1,6 +1,7 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { PaginationParams } from '@/core/repositories/pagination-params';
 import { DomainEvents } from '@/domain/events/domain-events';
+import { AnswerAttachmentsRepository } from '@/domain/forum/application/repositories/answer-attachments-repository';
 import { AnswersRepository } from '@/domain/forum/application/repositories/answers-repository';
 import { Answer } from '@/domain/forum/enterprise/entities/answer';
 import { Injectable } from '@nestjs/common';
@@ -9,7 +10,10 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PrismaAnswersRepository implements AnswersRepository {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private answerAttachmentsRepository: AnswerAttachmentsRepository,
+  ) {}
 
   async create(answer: Answer): Promise<void> {
     const answerData = PrismaAnswerMapper.toPrisma(answer);
@@ -17,17 +21,29 @@ export class PrismaAnswersRepository implements AnswersRepository {
       data: answerData,
     });
 
+    await this.answerAttachmentsRepository.createMany(
+      answer.getAttachments().getItems(),
+    );
+
     DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(answer.getId()));
   }
 
   async save(answer: Answer): Promise<void> {
     const answerData = PrismaAnswerMapper.toPrisma(answer);
-    await this.prismaService.answer.update({
-      where: {
-        id: answer.getId(),
-      },
-      data: answerData,
-    });
+    await Promise.all([
+      this.prismaService.answer.update({
+        where: {
+          id: answer.getId(),
+        },
+        data: answerData,
+      }),
+      this.answerAttachmentsRepository.createMany(
+        answer.getAttachments().getNewItems(),
+      ),
+      this.answerAttachmentsRepository.deleteMany(
+        answer.getAttachments().getRemovedItems(),
+      ),
+    ]);
 
     DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(answer.getId()));
   }

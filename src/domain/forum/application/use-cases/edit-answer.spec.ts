@@ -102,4 +102,56 @@ describe('Edit Answer Use Case', () => {
     expect(result.isLeft()).toBe(true);
     expect(result.value).toBeInstanceOf(NotAllowedError);
   });
+
+  test('deve sincronizar os anexos (attachments) removidos e editados de uma resposta (answer)', async () => {
+    const inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+    const inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository,
+    );
+
+    const editAnswer = new EditAnswerUseCase(
+      inMemoryAnswersRepository,
+      inMemoryAnswerAttachmentsRepository,
+    );
+
+    const newAnswer = makeAnswer(
+      {
+        authorId: new UniqueEntityID('user-id'),
+      },
+      new UniqueEntityID('id-answer'),
+    );
+
+    await inMemoryAnswersRepository.create(newAnswer);
+
+    inMemoryAnswerAttachmentsRepository.items.push(
+      makeAnswerAttachment({
+        answerId: new UniqueEntityID(newAnswer.getId()),
+        attachmentId: new UniqueEntityID('1'),
+      }),
+    );
+
+    inMemoryAnswerAttachmentsRepository.items.push(
+      makeAnswerAttachment({
+        answerId: new UniqueEntityID(newAnswer.getId()),
+        attachmentId: new UniqueEntityID('2'),
+      }),
+    );
+
+    const result = await editAnswer.execute({
+      userId: newAnswer.getAuthorId(),
+      answerId: newAnswer.getId(),
+      content: 'New content edited',
+      attachmentsIds: ['1', '3'], // attachment 2 removed
+    });
+
+    expect(result.isRight()).toBe(true);
+    expect(inMemoryAnswerAttachmentsRepository.items).toHaveLength(2);
+    expect(inMemoryAnswerAttachmentsRepository.items[0].getAttachmentId()).toBe(
+      '1',
+    );
+    expect(inMemoryAnswerAttachmentsRepository.items[1].getAttachmentId()).toBe(
+      '3',
+    );
+  });
 });
