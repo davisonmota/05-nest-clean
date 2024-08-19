@@ -3,8 +3,8 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { Optional } from '@/core/types/optional';
 import dayjs from 'dayjs';
 import { QuestionBestAnswerChosenEvent } from '../event/question-best-answer-chosen-event';
-import { Slug } from './Slug';
 import { QuestionAttachmentList } from './question-attachment-list';
+import { Slug } from './value-object/Slug';
 
 export interface QuestionProps {
   title: string;

@@ -1,5 +1,5 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
-import { Slug } from '@/domain/forum/enterprise/entities/Slug';
+import { Slug } from '@/domain/forum/enterprise/entities/value-object/Slug';
 import { AppModule } from '@/infra/app.module';
 import { DatabaseModule } from '@/infra/database/database.module';
 import { INestApplication } from '@nestjs/common';
