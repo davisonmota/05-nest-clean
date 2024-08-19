@@ -1,6 +1,6 @@
 import { Either, right } from '@/core/either';
 import { Injectable } from '@nestjs/common';
-import { AnswerComment } from '../../enterprise/entities/answer-comment';
+import { CommentWithAuthor } from '../../enterprise/entities/value-object/comment-with-author';
 import { AnswerCommentsRepository } from '../repositories/answer-comments-repository';
 
 type Input = {
@@ -11,7 +11,7 @@ type Input = {
 type Output = Either<
   null,
   {
-    answerComments: AnswerComment[];
+    comments: CommentWithAuthor[];
   }
 >;
 
@@ -22,13 +22,16 @@ export class FetAnswerCommentUseCase {
   ) {}
 
   async execute({ answerId, page }: Input): Promise<Output> {
-    const answerComments =
-      await this.answerCommentsRepository.findManyByAnswerId(answerId, {
-        page,
-      });
+    const comments =
+      await this.answerCommentsRepository.findManyByAnswerIdWithAuthor(
+        answerId,
+        {
+          page,
+        },
+      );
 
     return right({
-      answerComments,
+      comments,
     });
   }
 }

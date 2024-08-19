@@ -57,6 +57,7 @@ export class PrismaQuestionCommentsRepository
 
     return questionCommentsData.map(PrismaQuestionCommentMapper.toDomain);
   }
+
   async findManyByQuestionIdWithAuthor(
     questionId: string,
     { page }: PaginationParams,
