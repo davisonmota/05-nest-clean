@@ -25,9 +25,10 @@ model User {
   password String
   role     UserRole @default(STUDENT)
 
-  questions Question[]
-  answers   Answer[]
-  comments  Comment[]
+  questions     Question[]
+  answers       Answer[]
+  comments      Comment[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -105,4 +106,17 @@ model Attachment {
 
   @@index([answerId, questionId])
   @@map("attachments")
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  title     String
+  content   String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  recipient   User   @relation(fields: [recipientId], references: [id])
+  recipientId String
+
+  @@map("notifications")
 }

@@ -1,5 +1,6 @@
 import { Either, right } from '@/core/either';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Injectable } from '@nestjs/common';
 import { Notification } from '../../enterprise/entities/notification';
 import { NotificationsRepository } from '../repositories/NotificationsRepository';
 
@@ -17,12 +18,13 @@ type Output = Either<
       recipientId: string;
       title: string;
       content: string;
-      readAt?: Date;
+      readAt?: Date | null;
       createdAt: Date;
     };
   }
 >;
 
+@Injectable()
 export class SendNotificationUseCase {
   constructor(
     private readonly notificationsRepository: NotificationsRepository,

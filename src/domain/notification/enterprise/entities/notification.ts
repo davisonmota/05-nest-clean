@@ -6,7 +6,7 @@ export interface NotificationProps {
   recipientId: UniqueEntityID;
   title: string;
   content: string;
-  readAt?: Date;
+  readAt?: Date | null;
   createdAt: Date;
 }
 
@@ -45,7 +45,7 @@ export class Notification extends Entity<NotificationProps> {
     return this.props.createdAt;
   }
 
-  getReadAt(): Date | undefined {
-    return this.props.readAt;
+  getReadAt(): Date | null {
+    return this.props.readAt ?? null;
   }
 }

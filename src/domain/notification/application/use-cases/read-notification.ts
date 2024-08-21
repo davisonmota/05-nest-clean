@@ -1,6 +1,7 @@
 import { Either, left, right } from '@/core/either';
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error ';
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error';
+import { Injectable } from '@nestjs/common';
 import { NotificationsRepository } from '../repositories/NotificationsRepository';
 
 type Input = {
@@ -16,12 +17,13 @@ type Output = Either<
       recipientId: string;
       title: string;
       content: string;
-      readAt?: Date;
+      readAt?: Date | null;
       createdAt: Date;
     };
   }
 >;
 
+@Injectable()
 export class ReadNotificationUseCase {
   constructor(
     private readonly notificationsRepository: NotificationsRepository,
