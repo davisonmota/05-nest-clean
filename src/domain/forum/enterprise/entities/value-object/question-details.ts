@@ -38,11 +38,11 @@ export class QuestionDetails extends ValueObject<QuestionDetailsProps> {
   }
 
   getContent(): string {
-    return this.props.slug;
+    return this.props.content;
   }
 
   getSlug(): string {
-    return this.props.content;
+    return this.props.slug;
   }
 
   getAttachments(): Attachment[] {

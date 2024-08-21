@@ -4,7 +4,9 @@ import { DomainEvents } from '@/domain/events/domain-events';
 import { QuestionAttachmentsRepository } from '@/domain/forum/application/repositories/question-attachments-repository';
 import { QuestionsRepository } from '@/domain/forum/application/repositories/questions-repository';
 import { Question } from '@/domain/forum/enterprise/entities/question';
+import { QuestionDetails } from '@/domain/forum/enterprise/entities/value-object/question-details';
 import { Injectable } from '@nestjs/common';
+import { PrismaQuestionDetailsMapper } from '../mappers/prisma-question-details-mapper';
 import { PrismaQuestionMapper } from '../mappers/prisma-question-mapper';
 import { PrismaService } from '../prisma.service';
 
@@ -61,6 +63,21 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     if (!questionData) return null;
 
     return PrismaQuestionMapper.toDomain(questionData);
+  }
+
+  async findDetailsBySlug(slug: string): Promise<QuestionDetails | null> {
+    const questionDetailsData = await this.prismaService.question.findUnique({
+      where: {
+        slug,
+      },
+      include: {
+        author: true,
+        attachments: true,
+      },
+    });
+    if (!questionDetailsData) return null;
+
+    return PrismaQuestionDetailsMapper.toDomain(questionDetailsData);
   }
 
   async findById(id: string): Promise<Question | null> {
