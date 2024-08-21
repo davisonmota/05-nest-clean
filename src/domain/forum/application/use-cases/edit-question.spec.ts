@@ -2,17 +2,23 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error ';
 import { makeQuestion } from 'test/factories/make-question';
 import { makeQuestionAttachment } from 'test/factories/make-question-attachment';
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository';
 import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-question-repository';
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository';
 import { describe, expect, test } from 'vitest';
 import { EditQuestionUseCase } from './edit-question';
 
 describe('Edit Question Use Case', () => {
   test('deve editar uma dúvida (question)', async () => {
+    const attachmentsRepository = new InMemoryAttachmentsRepository();
+    const studentsRepository = new InMemoryStudentsRepository();
     const inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository();
     const inMemoryRepositoryQuestions = new InMemoryQuestionsRepository(
       inMemoryQuestionAttachmentsRepository,
+      attachmentsRepository,
+      studentsRepository,
     );
 
     const editQuestion = new EditQuestionUseCase(
@@ -74,10 +80,14 @@ describe('Edit Question Use Case', () => {
   });
 
   test('Não deve editar uma dúvida (question) se não for o autor', async () => {
+    const attachmentsRepository = new InMemoryAttachmentsRepository();
+    const studentsRepository = new InMemoryStudentsRepository();
     const inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository();
     const inMemoryRepositoryQuestions = new InMemoryQuestionsRepository(
       inMemoryQuestionAttachmentsRepository,
+      attachmentsRepository,
+      studentsRepository,
     );
 
     const editQuestion = new EditQuestionUseCase(
@@ -107,12 +117,15 @@ describe('Edit Question Use Case', () => {
   });
 
   test('deve sincronizar os anexos (attachments) removidos e editados de uma dúvida (question)', async () => {
+    const attachmentsRepository = new InMemoryAttachmentsRepository();
+    const studentsRepository = new InMemoryStudentsRepository();
     const inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository();
     const inMemoryRepositoryQuestions = new InMemoryQuestionsRepository(
       inMemoryQuestionAttachmentsRepository,
+      attachmentsRepository,
+      studentsRepository,
     );
-
     const editQuestion = new EditQuestionUseCase(
       inMemoryRepositoryQuestions,
       inMemoryQuestionAttachmentsRepository,

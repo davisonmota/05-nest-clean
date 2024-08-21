@@ -64,7 +64,9 @@ export class InMemoryQuestionsRepository implements QuestionsRepository {
     );
 
     if (!author) {
-      throw new Error(`Author with ID "${question.getId()} does not exists."`);
+      throw new Error(
+        `Author with ID "${question.getAuthorId()} does not exists."`,
+      );
     }
 
     const questionAttachments = this.questionAttachmentsRepository.items.filter(
@@ -75,7 +77,7 @@ export class InMemoryQuestionsRepository implements QuestionsRepository {
 
     const attachments = questionAttachments.map((questionAttachment) => {
       const attachment = this.attachmentsRepository.items.find((attachment) => {
-        return attachment.getId() === questionAttachment.getId();
+        return attachment.getId() === questionAttachment.getAttachmentId();
       });
 
       if (!attachment) {

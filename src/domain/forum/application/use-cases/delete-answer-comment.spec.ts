@@ -1,13 +1,15 @@
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error ';
 import { makeAnswerComment } from 'test/factories/make-answer-comment';
 import { InMemoryAnswerCommentsRepository } from 'test/repositories/in-memory-answer-comments-repository';
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository';
 import { describe, expect, test } from 'vitest';
 import { DeleteAnswerCommentUseCase } from './delete-answer-comment';
 
 describe('Delete Answer Comment Use Case', () => {
   test('should be able to delete a answer comment', async () => {
+    const inMemoryStudentsRepository = new InMemoryStudentsRepository();
     const inMemoryAnswerCommentsRepository =
-      new InMemoryAnswerCommentsRepository();
+      new InMemoryAnswerCommentsRepository(inMemoryStudentsRepository);
     const deleteAnswerCommentUseCase = new DeleteAnswerCommentUseCase(
       inMemoryAnswerCommentsRepository,
     );
@@ -24,8 +26,9 @@ describe('Delete Answer Comment Use Case', () => {
   });
 
   test('should not  be able to delete another user answer comment', async () => {
+    const inMemoryStudentsRepository = new InMemoryStudentsRepository();
     const inMemoryAnswerCommentsRepository =
-      new InMemoryAnswerCommentsRepository();
+      new InMemoryAnswerCommentsRepository(inMemoryStudentsRepository);
     const deleteAnswerCommentUseCase = new DeleteAnswerCommentUseCase(
       inMemoryAnswerCommentsRepository,
     );

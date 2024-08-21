@@ -1,15 +1,21 @@
 import { makeQuestion } from 'test/factories/make-question';
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository';
 import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository';
 import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-question-repository';
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository';
 import { describe, expect, test } from 'vitest';
 import { FetchRecentQuestionUseCase } from './fetch-recent-questions';
 
 describe('Fetch Recente Question Use Case', () => {
   test('should be able to fetch recent questions', async () => {
-    const questionAttachmentsRepository =
+    const attachmentsRepository = new InMemoryAttachmentsRepository();
+    const studentsRepository = new InMemoryStudentsRepository();
+    const inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository();
     const inMemoryRepositoryQuestions = new InMemoryQuestionsRepository(
-      questionAttachmentsRepository,
+      inMemoryQuestionAttachmentsRepository,
+      attachmentsRepository,
+      studentsRepository,
     );
     const fetchRecentQuestionsUseCase = new FetchRecentQuestionUseCase(
       inMemoryRepositoryQuestions,
@@ -39,10 +45,14 @@ describe('Fetch Recente Question Use Case', () => {
   });
 
   test('should be able to fetch paginated recent questions', async () => {
-    const questionAttachmentsRepository =
+    const attachmentsRepository = new InMemoryAttachmentsRepository();
+    const studentsRepository = new InMemoryStudentsRepository();
+    const inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository();
     const inMemoryRepositoryQuestions = new InMemoryQuestionsRepository(
-      questionAttachmentsRepository,
+      inMemoryQuestionAttachmentsRepository,
+      attachmentsRepository,
+      studentsRepository,
     );
     const fetchRecentQuestionsUseCase = new FetchRecentQuestionUseCase(
       inMemoryRepositoryQuestions,
