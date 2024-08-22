@@ -5,6 +5,7 @@ import { QuestionAttachmentsRepository } from '@/domain/forum/application/reposi
 import { QuestionsRepository } from '@/domain/forum/application/repositories/questions-repository';
 import { Question } from '@/domain/forum/enterprise/entities/question';
 import { QuestionDetails } from '@/domain/forum/enterprise/entities/value-object/question-details';
+import { CacheRepository } from '@/infra/cache/cache-repositoy';
 import { Injectable } from '@nestjs/common';
 import { PrismaQuestionDetailsMapper } from '../mappers/prisma-question-details-mapper';
 import { PrismaQuestionMapper } from '../mappers/prisma-question-mapper';
@@ -14,6 +15,7 @@ import { PrismaService } from '../prisma.service';
 export class PrismaQuestionsRepository implements QuestionsRepository {
   constructor(
     private prismaService: PrismaService,
+    private cacheRepository: CacheRepository,
     private questionAttachmentsRepository: QuestionAttachmentsRepository,
   ) {}
 
@@ -47,6 +49,7 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
       this.questionAttachmentsRepository.deleteMany(
         question.getAttachments().getRemovedItems(),
       ),
+      this.cacheRepository.delete(`question:${questionData.slug}:details`),
     ]);
 
     DomainEvents.dispatchEventsForAggregate(
@@ -55,6 +58,12 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
   }
 
   async findBySlug(slug: string): Promise<Question | null> {
+    const cacheHit = await this.cacheRepository.get(`question:${slug}:details`);
+    if (cacheHit) {
+      const cacheData = JSON.parse(cacheHit);
+      return cacheData;
+    }
+
     const questionData = await this.prismaService.question.findUnique({
       where: {
         slug,
@@ -62,7 +71,14 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     });
     if (!questionData) return null;
 
-    return PrismaQuestionMapper.toDomain(questionData);
+    const questionDetails = PrismaQuestionMapper.toDomain(questionData);
+
+    await this.cacheRepository.set(
+      `question:${slug}:details`,
+      JSON.stringify(questionDetails),
+    );
+
+    return questionDetails;
   }
 
   async findDetailsBySlug(slug: string): Promise<QuestionDetails | null> {
