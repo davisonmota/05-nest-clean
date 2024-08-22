@@ -27,6 +27,6 @@ describe('Send Notification Use Case', () => {
       'Conteúdo da notificação (notification)',
     );
     expect(result.value?.notification.createdAt).toBeInstanceOf(Date);
-    expect(result.value?.notification.readAt).toBeUndefined();
+    expect(result.value?.notification.readAt).toBeNull();
   });
 });
