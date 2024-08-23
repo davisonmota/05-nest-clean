@@ -5,7 +5,7 @@ import { QuestionAttachmentsRepository } from '@/domain/forum/application/reposi
 import { QuestionsRepository } from '@/domain/forum/application/repositories/questions-repository';
 import { Question } from '@/domain/forum/enterprise/entities/question';
 import { QuestionDetails } from '@/domain/forum/enterprise/entities/value-object/question-details';
-import { CacheRepository } from '@/infra/cache/cache-repositoy';
+import { CacheRepository } from '@/infra/cache/cache-repository';
 import { Injectable } from '@nestjs/common';
 import { PrismaQuestionDetailsMapper } from '../mappers/prisma-question-details-mapper';
 import { PrismaQuestionMapper } from '../mappers/prisma-question-mapper';
